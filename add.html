@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        ul{
+            list-style: none;
+            margin: 50px auto;
+            padding: 50px;
+            width: 300px;
+            border: 1px solid blueviolet;
+        }
+        ul li{
+            line-height: 30px;
+            text-align: center
+        }
+        ul li input{
+            height: 20px;
+            width: 200px;
+        }
+        #submit{
+            text-align: center;
+            width: 100px;
+            height: 30px;
+            margin-top: 20px
+        }
+
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li>
+            <label for="uname">姓名</label>
+            <input type="text" id="uname">
+        </li>
+        <li>
+            <label for="age">年龄</label>
+            <input type="text" id="age">
+        </li>
+        <li>
+            <label for="phone">电话</label>
+            <input type="text" id="phone">
+        </li>
+        <li>
+            <label for="address">地址</label>
+            <input type="text" id="address">
+        </li>
+        <li><input type="submit" value="提交" id="submit"></li>
+    </ul>
+</body>
+
+</html>
+<script src="ajax.js"></script>
+<script>
+    var submit = document.getElementById('submit');
+
+    // 判断新增&修改
+
+    var url = window.location.href;
+    var flag = url.indexOf('=')
+    var id = url.substring(flag + 1);
+    // console.log(id);
+    if (flag > -1) {
+        // 通过id发送ajax给后台获取对应用户的信息返回显示再前台
+        ajax({
+            url: '/getInfo?id=' + id,
+        }).then(res => {
+            if (res.code == 0) {
+                // console.log(res.data);
+                var cur = res.data;
+                uname.value = cur.name;
+                age.value = cur.age;
+                phone.value = cur.phone;
+                address.value = cur.address;
+            }
+            // 请求修改数据的接口
+            submit.onclick = function () {
+                var data = {
+                    name: uname.value,
+                    age: age.value,
+                    phone: phone.value,
+                    address: address.value,
+                    id:id
+                }
+                ajax({
+                    url: '/updateInfo',
+                    method: 'post',
+                    data: JSON.stringify(data)
+                }).then(res => {
+                    if (res.code == 0) {
+                        window.location.href = 'index.html';
+                    }
+                })
+            }
+        })
+
+    } else {
+        submit.onclick = function () {
+            var data = {
+                name: uname.value,
+                age: age.value,
+                phone: phone.value,
+                address: address.value
+            }
+            ajax({
+                url: '/addInfo',
+                method: 'post',
+                data: JSON.stringify(data)
+            }).then(res => {
+                if (res.code == 0) {
+                    window.location.href = 'index.html';
+                }
+            })
+        }
+    }
+</script>
